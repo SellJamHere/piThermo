@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/SellJamHere/dataWhereHouse/models"
 	"github.com/SellJamHere/piBot/thermo"
-	"github.com/SellJamHere/thermoBot/models"
 	r "github.com/dancannon/gorethink"
 )
 
