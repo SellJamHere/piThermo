@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	serverAddress = ""
 	piSerial      = ""
 	piDeviceId    = "e0a701e4-f37c-4d6b-adbb-4cc6995a266b"
 	diffThreshold = 0.15
@@ -26,7 +27,7 @@ func main() {
 	}
 
 	session, err = r.Connect(r.ConnectOpts{
-		Address: "162.243.156.65:28015",
+		Address: serverAddress,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
