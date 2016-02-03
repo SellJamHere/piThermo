@@ -3,16 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"time"
 
-	"github.com/SellJamHere/dataWhereHouse/models"
 	"github.com/SellJamHere/piBot/thermo"
+	"github.com/SellJamHere/piThermo/models"
 	r "github.com/dancannon/gorethink"
 )
 
 const (
-	piSerial   = ""
-	piDeviceId = "e0a701e4-f37c-4d6b-adbb-4cc6995a266b"
+	piSerial      = ""
+	piDeviceId    = "e0a701e4-f37c-4d6b-adbb-4cc6995a266b"
+	diffThreshold = 0.15
 )
 
 func main() {
@@ -30,6 +32,9 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
+	var lastTemp float64
+	lastTemp = 0.0
+
 	for {
 		temp, err := tempReader.ReadTemp()
 		if err != nil {
@@ -37,12 +42,19 @@ func main() {
 			panic("Error reading temp")
 		}
 
-		dbTemp := models.DbTemperatureFromThermo(*temp)
+		diff := temp.Celsius - lastTemp
 
-		_, err = r.DB("dataWhereHouse").Table("event").Insert(dbTemp).RunWrite(session)
-		if err != nil {
-			log.Fatalln(err.Error())
+		if math.Abs(diff) > diffThreshold {
+			lastTemp = temp.Celsius
+
+			dbTemp := models.DbTemperatureFromThermo(*temp)
+
+			_, err = r.DB("dataWhereHouse").Table("event").Insert(dbTemp).RunWrite(session)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
 		}
-		time.Sleep(5 * time.Minute)
+
+		time.Sleep(1 * time.Minute)
 	}
 }
