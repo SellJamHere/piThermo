@@ -49,6 +49,7 @@ func main() {
 			lastTemp = temp.Celsius
 
 			dbTemp := models.DbTemperatureFromThermo(*temp)
+			dbTemp.DeviceId = piDeviceId
 
 			_, err = r.DB("dataWhereHouse").Table("event").Insert(dbTemp).RunWrite(session)
 			if err != nil {
